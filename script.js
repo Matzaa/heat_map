@@ -38,14 +38,14 @@
 
         const xScale = d3
             .scaleLinear()
-            .domain([minYear, maxYear])
+            .domain([minYear, maxYear + 1])
             .range([padding, w - padding]);
 
         const yScale = d3
-            .scaleLinear()
+            .scaleTime()
             .domain([
-                d3.min(data, (d) => d.month),
-                d3.max(data, (d) => d.month),
+                d3.min(data, (d) => new Date(0, d.month, 0, 0, 0, 0, 0)),
+                d3.max(data, (d) => new Date(0, 11, 0, 0, 0, 0, 0)),
             ])
             .range([h - padding, padding]);
 
@@ -61,6 +61,29 @@
             .style("visibility", "hidden")
             .text("");
 
+        // colors
+
+        const colorScale = d3
+            .scaleLinear()
+            .domain([0, 5])
+            .range([
+                d3.min(data, (d) => d.variance),
+                d3.max(data, (d) => d.variance),
+            ]);
+
+        console.log("min vari", colorScale(0));
+
+        // legend
+
+        const legend = d3
+            .select("body")
+            .append("svg")
+            .attr("width", 300)
+            .attr("height", 80)
+            .attr("id", "legend")
+            .style("background-color", "pink")
+            .style("margin-top", "10px");
+
         // graph
 
         svg.selectAll("rect")
@@ -72,12 +95,20 @@
             .attr("data-year", (d) => d.year)
             .attr("data-temp", (d) => d.variance)
             .attr("x", (d, i) => xScale(d.year))
-            .attr("y", (d) => yScale(d.month + 1))
+            .attr("y", (d) => yScale(new Date(0, d.month, 0, 0, 0, 0, 0)))
             .attr("width", (d) => (w - 2 * padding) / (maxYear - minYear))
             .attr("height", (h - padding * 2) / 12)
             .attr("fill", (d) => {
-                if (d.variance <= -1) {
-                    return "blue";
+                if (d.variance <= colorScale(1)) {
+                    return "rgb(115, 197, 230)";
+                } else if (d.variance <= colorScale(2)) {
+                    return "rgb(115, 230, 186)";
+                } else if (d.variance <= colorScale(3)) {
+                    return "rgb(231, 223, 111)";
+                } else if (d.variance <= colorScale(4)) {
+                    return "rgb(230, 180, 115)";
+                } else if (d.variance <= colorScale(5)) {
+                    return "rgb(231, 94, 94)";
                 }
             })
             .attr("opacity", 0.6)
@@ -98,7 +129,7 @@
         // axes
 
         const xAxis = d3.axisBottom(xScale).tickFormat(d3.format("d"));
-        const yAxis = d3.axisLeft(yScale);
+        const yAxis = d3.axisLeft(yScale).tickFormat(d3.timeFormat("%B"));
 
         svg.append("g")
             .attr("transform", `translate(0, ${h - padding})`)
