@@ -5,6 +5,10 @@
         .then((res) => res.json())
         .then(({ monthlyVariance }) => {
             console.log("data :", monthlyVariance);
+
+            monthlyVariance.forEach((el) => {
+                el.month = el.month - 1;
+            });
             makeHeatMap(monthlyVariance);
         });
 
@@ -16,7 +20,8 @@
         const description = d3
             .select("body")
             .append("text")
-            .text("description")
+            .attr("id", "description")
+            .text("Teperature from 1753 to 2015 in Celsius")
             .attr("transform", "translate(0, 40");
 
         const svg = d3
@@ -28,9 +33,12 @@
 
         // scales
 
+        const minYear = d3.min(data, (d) => d.year);
+        const maxYear = d3.max(data, (d) => d.year);
+
         const xScale = d3
             .scaleLinear()
-            .domain([d3.min(data, (d) => d.year), d3.max(data, (d) => d.year)])
+            .domain([minYear, maxYear])
             .range([padding, w - padding]);
 
         const yScale = d3
@@ -59,13 +67,19 @@
             .data(data)
             .enter()
             .append("rect")
+            .attr("class", "cell")
             .attr("data-month", (d) => d.month)
             .attr("data-year", (d) => d.year)
             .attr("data-temp", (d) => d.variance)
             .attr("x", (d, i) => xScale(d.year))
             .attr("y", (d) => yScale(d.month + 1))
-            .attr("width", 3)
+            .attr("width", (d) => (w - 2 * padding) / (maxYear - minYear))
             .attr("height", (h - padding * 2) / 12)
+            .attr("fill", (d) => {
+                if (d.variance <= -1) {
+                    return "blue";
+                }
+            })
             .attr("opacity", 0.6)
             .on("mouseover", (e, d) => {
                 tooltip
@@ -83,7 +97,7 @@
 
         // axes
 
-        const xAxis = d3.axisBottom(xScale);
+        const xAxis = d3.axisBottom(xScale).tickFormat(d3.format("d"));
         const yAxis = d3.axisLeft(yScale);
 
         svg.append("g")
