@@ -62,6 +62,13 @@
             .text("");
 
         // colors
+        const colors = [
+            "rgb(115, 197, 230)",
+            "rgb(115, 230, 186)",
+            "rgb(231, 223, 111)",
+            "rgb(230, 180, 115)",
+            "rgb(231, 94, 94)",
+        ];
 
         const colorScale = d3
             .scaleLinear()
@@ -75,6 +82,7 @@
 
         // legend
 
+        const legendSqW = 50;
         const legend = d3
             .select("body")
             .append("svg")
@@ -84,6 +92,26 @@
             .style("background-color", "pink")
             .style("margin-top", "10px");
 
+        legend
+            .selectAll("rect")
+            .data(colors)
+            .enter()
+            .append("rect")
+            .attr("x", (d, i) => i * legendSqW + legendSqW / 2)
+            .attr("y", 20)
+            .attr("fill", (d) => d)
+            .attr("width", legendSqW)
+            .attr("height", 30);
+
+        // legend
+        //     .append("text")
+        //     .attr("transform", "translate(25, 60)")
+        //     .text(`${colorScale(0)}-${colorScale(1)}`);
+        const legendAxis = d3.axisBottom(colorScale);
+        legend
+            .append("g")
+            .attr("transform", "translate(20, 60)")
+            .call(legendAxis);
         // graph
 
         svg.selectAll("rect")
