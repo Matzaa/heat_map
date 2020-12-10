@@ -45,7 +45,7 @@
             .scaleTime()
             .domain([
                 d3.min(data, (d) => new Date(0, d.month, 0, 0, 0, 0, 0)),
-                d3.max(data, (d) => new Date(0, 11, 0, 0, 0, 0, 0)),
+                d3.max(data, (d) => new Date(0, 12, 0, 0, 0, 0, 0)),
             ])
             .range([h - padding, padding]);
 
@@ -95,7 +95,7 @@
             .attr("data-year", (d) => d.year)
             .attr("data-temp", (d) => d.variance)
             .attr("x", (d, i) => xScale(d.year))
-            .attr("y", (d) => yScale(new Date(0, d.month, 0, 0, 0, 0, 0)))
+            .attr("y", (d) => yScale(new Date(0, d.month + 1, 0, 0, 0, 0, 0)))
             .attr("width", (d) => (w - 2 * padding) / (maxYear - minYear))
             .attr("height", (h - padding * 2) / 12)
             .attr("fill", (d) => {
@@ -118,6 +118,7 @@
                     .style("top", e.pageY - 20 + "px")
                     .style("transform", "translateX(100px)")
                     .style("visibility", "visible")
+                    .attr("data-year", d.year)
                     .html(
                         `<p>${d.variance}</p><p>${d.year}</p><p>${d.month}</p>`
                     );
