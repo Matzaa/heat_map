@@ -17,13 +17,6 @@
         const w = 1000;
         const padding = 100;
 
-        const description = d3
-            .select("body")
-            .append("text")
-            .attr("id", "description")
-            .text("Teperature from 1753 to 2015 in Celsius")
-            .attr("transform", "translate(0, 40");
-
         const svg = d3
             .select("body")
             .append("svg")
@@ -62,6 +55,7 @@
             .text("");
 
         // colors
+
         const colors = [
             "rgb(115, 197, 230)",
             "rgb(115, 230, 186)",
@@ -82,6 +76,14 @@
 
         // legend
 
+        const x = d3
+            .scaleLinear()
+            .domain([
+                d3.min(data, (d) => d.variance),
+                d3.max(data, (d) => d.variance),
+            ])
+            .range([0, 240]);
+
         const legendSqW = 50;
         const legend = d3
             .select("body")
@@ -90,7 +92,7 @@
             .attr("height", 80)
             .attr("id", "legend")
             .style("background-color", "pink")
-            .style("margin-top", "10px");
+            .style("margin-top", "40px");
 
         legend
             .selectAll("rect")
@@ -103,15 +105,13 @@
             .attr("width", legendSqW)
             .attr("height", 30);
 
-        // legend
-        //     .append("text")
-        //     .attr("transform", "translate(25, 60)")
-        //     .text(`${colorScale(0)}-${colorScale(1)}`);
-        const legendAxis = d3.axisBottom(colorScale);
+        const legXaxis = d3.axisBottom(x);
+
         legend
             .append("g")
-            .attr("transform", "translate(20, 60)")
-            .call(legendAxis);
+            .attr("transform", "translate(25, 50)")
+            .call(legXaxis);
+
         // graph
 
         svg.selectAll("rect")
